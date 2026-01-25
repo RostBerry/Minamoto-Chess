@@ -1,0 +1,13 @@
+[package]
+name = "minamoto-chess-wasm"
+version = "0.0.0"
+authors = ["Rostislavs Berjoza <rostislavs.berjoza.work@gmail.com>"]
+edition = "2024"
+
+[dependencies]
+minamoto-chess = { path = "../minamoto-chess" }
+wasm-bindgen = "0.2.108"
+getrandom = { version = "0.3.4", features = ["wasm_js"] }
+
+[lib]
+crate-type = ["cdylib", "rlib"]

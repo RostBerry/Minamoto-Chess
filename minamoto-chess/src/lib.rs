@@ -1,0 +1,11 @@
+pub mod config;
+pub mod piece;
+pub mod r#move;
+pub mod board;
+pub mod castling;
+pub mod board_representation;
+pub mod precomputed_data;
+pub mod bitboards;
+pub mod move_generation;
+pub mod perft;
+pub mod zobrist;
