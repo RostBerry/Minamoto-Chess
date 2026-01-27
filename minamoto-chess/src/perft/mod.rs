@@ -14,12 +14,12 @@ pub fn run_perft(depth: u8, board: &mut Board) -> PerftResult {
 
     
     let mut move_buffer: Vec<Vec<Move>> = (0..depth)
-        .map(|_| Vec::with_capacity(move_gen::MAX_MOVES_PER_POS))
+        .map(|_| move_gen::create_empty_move_buffer())
         .collect();
 
     let (root_moves, remaining_buffer) = move_buffer.split_at_mut(1);
     let root_moves = unsafe { root_moves.get_unchecked_mut(0) };
-    root_moves.clear();
+    // root_moves.clear();
     
     let attack_calc = AttackCalculator::new(board);
     move_gen::generate_moves(root_moves, board, &attack_calc);

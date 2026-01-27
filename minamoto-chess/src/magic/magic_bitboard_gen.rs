@@ -36,9 +36,9 @@ pub fn generate_magic_number(square: usize, slider_index: usize) -> SquareMagic 
 }
 
 fn get_magic_json_path(path: &str) -> String {
-    let path_in_cwd = format!("minamoto-chess-core/src/{}", path);
-    let path_in_parent = format!("../minamoto-chess-core/src/{}", path);
-    let path_in_grandparent = format!("../../minamoto-chess-core/src/{}", path);
+    let path_in_cwd = format!("minamoto-chess/src/{}", path);
+    let path_in_parent = format!("../minamoto-chess/src/{}", path);
+    let path_in_grandparent = format!("../../minamoto-chess/src/{}", path);
 
     if Path::new(&path_in_cwd).exists() {
         path_in_cwd

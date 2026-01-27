@@ -1,6 +1,6 @@
 use minamoto_chess_core::{board::Board, castling, piece::{self, BLACK, WHITE}, zobrist};
 
-use crate::{board_extenstions::BoardExtensions, board_representation};
+use crate::{board_extensions::BoardExtensions, board_representation};
 
 pub trait FenApi {
     fn from_fen(fen: &str) -> Self;

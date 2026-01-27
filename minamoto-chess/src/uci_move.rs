@@ -1,9 +1,11 @@
 use std::fmt::Display;
 
-use minamoto_chess_core::{r#move::{Move, MoveType}, piece};
+use minamoto_chess_core::{r#move::{Move}, piece};
+use serde::{Deserialize, Serialize};
 
-use crate::board_representation::{get_piece_from_fen, get_square_from_name, get_square_name, piece_to_fen_sym};
+use crate::{board_representation::{get_piece_from_fen, get_square_from_name, get_square_name, piece_to_fen_sym}, move_type_wrapper::MoveType};
 
+#[derive(Serialize, Deserialize)]
 pub struct UciMove {
     pub move_type: MoveType,
     pub start_square: usize,
@@ -50,7 +52,7 @@ impl UciMove {
 
     pub fn from_move(mov: Move) -> Self {
         Self {
-            move_type: mov.move_type,
+            move_type: MoveType::from(mov.move_type),
             start_square: mov.start_square,
             target_square: mov.target_square
         }

@@ -54,6 +54,8 @@ fn get_en_passant_rank_mask(color: usize) -> u64 {
 pub struct AttackCalculator {
     /// Bitboard with every square when the king obviously can't go 
     /// because he will be immediately hit by some enemy piece
+    /// 
+    /// Bitboard at index 0 contains every attacked square
     pub squares_in_attack_bb: [u64; 7],
     /// Bitboard with every square the player can go to to avoid being in check 
     /// without moving the king

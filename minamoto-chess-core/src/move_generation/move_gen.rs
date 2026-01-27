@@ -10,6 +10,10 @@ use super::attack_calculator::AttackCalculator;
 /// The number was eyeballed
 pub const MAX_MOVES_PER_POS: usize = 150;
 
+pub fn create_empty_move_buffer() -> Vec<Move> {
+    Vec::with_capacity(MAX_MOVES_PER_POS)
+}
+
 const KING_SIDE_CASTLING_MASK: [u64; 2] = [bitboards::WHITE_KING_SIDE_CASTLING_MASK, bitboards::BLACK_KING_SIDE_CASTLING_MASK];
 fn get_king_side_castling_mask(color: usize) -> u64 {
     debug_assert!(color < 2, "Color index out of bounds");

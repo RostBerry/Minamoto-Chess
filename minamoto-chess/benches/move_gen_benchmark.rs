@@ -9,7 +9,7 @@ fn benchmark_comparison(c: &mut Criterion) {
     
     // Shared resources
     let mut board = Board::from_fen(config::BENCHMARK_FEN);
-    let mut legal_moves = Vec::with_capacity(218);
+    let mut legal_moves = move_gen::create_empty_move_buffer();
 
     group.bench_function(BenchmarkId::new("legal_movegen_benchmark", ""), |b| {
         b.iter(|| {
@@ -36,7 +36,7 @@ fn benchmark_comparison(c: &mut Criterion) {
 
     legal_moves.clear();
     move_gen::generate_moves(&mut legal_moves, &mut board, &attack_calc);
-    let mut filtered_moves = Vec::with_capacity(legal_moves.len());
+    let mut filtered_moves = move_gen::create_empty_move_buffer();
 
     group.bench_function(BenchmarkId::new("move_gen_quiescence_benchmark", ""), |b| {
         b.iter(|| {

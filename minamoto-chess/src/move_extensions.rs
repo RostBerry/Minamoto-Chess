@@ -1,6 +1,6 @@
-use minamoto_chess_core::{bitboards, board::{self, Board}, r#move::{Move, MoveType}, piece};
+use minamoto_chess_core::{bitboards, board::{self, Board}, r#move::{Move}, piece};
 
-use crate::{board_representation::{get_square_name, piece_to_fen_sym}, uci_move::UciMove};
+use crate::{board_representation::{get_square_name, piece_to_fen_sym}, move_type_wrapper::MoveType, uci_move::UciMove};
 
 pub fn print(moves: &[Move]) {
     println!("All moves({}):", moves.len());
@@ -15,7 +15,7 @@ pub fn move_to_string(mov: &Move) -> String {
         "{}{}{}", 
         get_square_name(mov.start_square), 
         get_square_name(mov.target_square), 
-        match mov.move_type {
+        match MoveType::from(mov.move_type) {
             MoveType::PromotionQueen => piece_to_fen_sym(piece::BLACK, piece::QUEEN).to_string(),
             MoveType::PromotionKnight => piece_to_fen_sym(piece::BLACK, piece::KNIGHT).to_string(),
             MoveType::PromotionRook => piece_to_fen_sym(piece::BLACK, piece::ROOK).to_string(),
@@ -42,7 +42,7 @@ impl MoveExtensions for Move {
             capture_square = board.en_passant_pawn_square();
         }
 
-        let mut move_type = mov.move_type;
+        let mut move_type = MoveType::from(mov.move_type);
 
         if piece_type == piece::KING && start_square == board::get_king_start_square(color) {
             if target_square == board::get_king_side_square(color) {
@@ -60,7 +60,7 @@ impl MoveExtensions for Move {
             start_square,
             target_square,
             capture_square,
-            move_type
+            move_type: move_type.into()
         }
     }
 }

@@ -1,0 +1,1 @@
+pub mod magic_bitboard_gen;
