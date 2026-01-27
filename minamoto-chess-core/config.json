@@ -1,5 +1,4 @@
 {
-    "do_all_promotions": false,
     "magics_path": "./src/precomputed_data/magics.json",
     "perft_position": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
     "perft_depth": 4

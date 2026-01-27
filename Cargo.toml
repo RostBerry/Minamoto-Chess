@@ -1,8 +1,8 @@
 [workspace]
 
 members = [
+    "minamoto-chess-core",
     "minamoto-chess",
-    "minamoto-chess-wasm",
 ]
 
 resolver = "3"

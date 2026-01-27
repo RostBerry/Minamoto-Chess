@@ -1,17 +1,19 @@
 use std::time::Duration;
 
-use minamoto_chess::{perft, board::Board, config};
+use minamoto_chess_core::{board::Board};
+use minamoto_chess::{config, fen_api::FenApi};
+use minamoto_chess::perft;
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
 
 fn benchmark_comparison (c: &mut Criterion) {
     let mut group = c.benchmark_group("minamoto_perft");
     
     // Shared resources
-    let mut board = Board::from_fen(config::CHESS_BENCHMARK_FEN);
+    let mut board = Board::from_fen(config::BENCHMARK_FEN);
 
     group.bench_function(BenchmarkId::new("perft_benchmark_depth_4", ""), |b| {
         b.iter(|| {
-            std::hint::black_box(perft::run_perft(config::PERFT_DEPTH, &mut board));
+            std::hint::black_box(perft::run_perft(4, &mut board));
         });
     });
 

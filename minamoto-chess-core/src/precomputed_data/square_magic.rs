@@ -1,4 +1,6 @@
-use super::{magic_bitboard_gen, magic_bitboard_data::{get_magic_number, get_shift}, magic_score::MagicScore};
+use crate::precomputed_data::magic_bitboards::{MagicValidationResult, validate_magic_number};
+
+use super::{magic_bitboards::{get_magic_number, get_shift}, magic_score::MagicScore};
 
 /// Contains essential information for the magics
 #[derive(Clone)]
@@ -14,9 +16,9 @@ impl SquareMagic {
     pub fn from_existent(square: usize, slider_index: usize) -> Self {
         let magic = get_magic_number(square, slider_index);
         let shift = get_shift(square, slider_index);
-        let score = match magic_bitboard_gen::validate_magic_number(magic, shift, square, slider_index) {
-            magic_bitboard_gen::MagicValidationResult::Valid(score) => score,
-            magic_bitboard_gen::MagicValidationResult::Invalid => panic!("Magic number is invalid")
+        let score = match validate_magic_number(magic, shift, square, slider_index) {
+            MagicValidationResult::Valid(score) => score,
+            MagicValidationResult::Invalid => panic!("Magic number is invalid")
         };
         Self {
             square,
@@ -27,9 +29,9 @@ impl SquareMagic {
     }
     /// Creates *SquareMagic* from the provided magic number
     pub fn new(square: usize, slider_index: usize, magic: u64, shift: usize) -> Self {
-        let score = match magic_bitboard_gen::validate_magic_number(magic, shift, square, slider_index) {
-            magic_bitboard_gen::MagicValidationResult::Valid(score) => score,
-            magic_bitboard_gen::MagicValidationResult::Invalid => panic!("Magic number is invalid")
+        let score = match validate_magic_number(magic, shift, square, slider_index) {
+            MagicValidationResult::Valid(score) => score,
+            MagicValidationResult::Invalid => panic!("Magic number is invalid")
         };
         Self {
             square,

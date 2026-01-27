@@ -1,4 +1,4 @@
-use super::magic_bitboard_data;
+use super::magic_bitboards;
 
 #[derive(Clone)]
 pub struct MagicScore {
@@ -12,7 +12,7 @@ impl MagicScore {
     /// Creates a *MagicScore* without validating the magic number
     pub fn from_validated(square: usize, max_index: usize, slider_index: usize) -> Self {
         let size = max_index * 8;
-        let theoretical_min_size = magic_bitboard_data::get_min_lookup_square_size(slider_index, square);
+        let theoretical_min_size = magic_bitboards::get_min_lookup_square_size(slider_index, square);
 
         if size < theoretical_min_size {
             panic!("I geniunely don't know what's happening, max index {}, theoretical min size {}", max_index, theoretical_min_size);

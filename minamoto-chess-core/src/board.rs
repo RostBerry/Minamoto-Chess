@@ -1,4 +1,4 @@
-use crate::{bitboards, board_representation, castling, r#move::{move_record::MoveRecord, Move, MoveType}, piece::{self, *}, zobrist};
+use crate::{bitboards, castling, r#move::{move_record::MoveRecord, Move, MoveType}, piece::{self, *}, zobrist};
 use rustc_hash::FxHashMap;
 
 // constants
@@ -51,14 +51,14 @@ pub fn get_queen_side_square(color: usize) -> usize {
 const CASTLED_KING_SIDE_ROOK_SQUARES: [usize; 2] = [2, 58];
 const CASTLED_QUEEN_SIDE_ROOK_SQUARES: [usize; 2] = [4, 60];
 
-pub fn get_castled_king_side_rook_square(color: usize) -> usize {
+fn get_castled_king_side_rook_square(color: usize) -> usize {
     debug_assert!(color < 2, "Color is out of bounds");
     unsafe {
         *CASTLED_KING_SIDE_ROOK_SQUARES.get_unchecked(color)
     }
 }
 
-pub fn get_castled_queen_side_rook_square(color: usize) -> usize {
+fn get_castled_queen_side_rook_square(color: usize) -> usize {
     debug_assert!(color < 2, "Color is out of bounds");
     unsafe {
         *CASTLED_QUEEN_SIDE_ROOK_SQUARES.get_unchecked(color)
@@ -71,7 +71,7 @@ const DEFAULT_CASTLING_STATES: [u8; 2] = [0b11, 0b11];
 
 /// Contains everything about the current position
 pub struct Board {
-    ///Contains bitboards for every piece type for each color
+    /// Contains bitboards for every piece type for each color
     /// 
     /// The bitboards at index 0 are for all pieces combined
     pieces: [[u64; 7]; 2],
@@ -94,7 +94,7 @@ pub struct Board {
 
 impl Board {
     /// Creates empty board
-    pub fn new () -> Self {
+    pub fn empty () -> Self {
         let board = Self {
             pieces: EMPTY_PIECES,
             squares: EMPTY_SQUARES,
@@ -110,172 +110,6 @@ impl Board {
         };
         
         board
-    }
-
-    /// Creates board from a position in the provided FEN string
-    pub fn from_fen(fen_string: &str) -> Self {
-        let fen_data: Vec<&str> = fen_string.split(" ").collect();
-
-        let mut board = Self::new();
-        board.load_position(fen_data[0]);
-
-        if fen_data.len() > 1 && fen_data[1] == "b" {
-            board.switch_color();
-        }
-
-        if fen_data.len() > 2 {
-            for i in 0..2 {
-                let can_short = fen_data[2].contains(if i == 0 {'K'} else {'k'});
-                let can_long = fen_data[2].contains(if i == 0 {'Q'} else {'q'});
-
-                board.castling_states[i] = 0b11;
-
-                if !can_short {
-                    castling::annul_king_side(&mut board.castling_states[i]);
-                }
-                if !can_long {
-                    castling::annul_queen_side(&mut board.castling_states[i]);
-                }
-            }
-        }
-
-        // Set en passant state if available
-        if fen_data.len() > 3 && fen_data[3] != "-" {
-            let square = board_representation::get_square_from_name(fen_data[3]);
-            let pawn_offset = if board.current_color == WHITE { 8 } else { -8i32 };
-            let capture_square = square;
-            let pawn_square = (square as i32 + pawn_offset) as usize;
-            board.update_en_passant_state(true, pawn_square, capture_square);
-        }
-
-        // Set halfmoves for 50-move rule
-        if fen_data.len() > 4 {
-            if let Ok(halfmoves) = fen_data[4].parse::<u8>() {
-                board.halfmoves_50_rule_counter = halfmoves;
-            }
-        }
-
-        // Set move counter
-        if fen_data.len() > 5 {
-            if let Ok(moves) = fen_data[5].parse::<u16>() {
-                board.move_counter = moves;
-            } else {
-                board.move_counter = 1;
-            }
-        } else {
-            board.move_counter = 1;
-        }
-        
-        // Calculate initial hash after position is set up
-        board.zobrist_hash = zobrist::calculate_hash(&board);
-        board.position_history.insert(board.zobrist_hash, 1);
-
-        board
-    }
-
-    fn load_position(&mut self, fen_pos: &str) {
-        let rows: Vec<&str> = fen_pos.split("/").collect();
-
-        for y in 0..8usize {
-            let mut x = 7i8;
-
-            for sym in rows[7 - y].chars() {
-                if x < 0 {
-                    continue;
-                }
-
-                if sym.is_digit(10) {
-                    x -= sym.to_digit(10).expect("FEN loading") as i8;
-                    continue;
-                }
-
-                let (color, piece_type) = board_representation::get_piece_from_fen(&sym);
-                let square = x as usize + y * 8;
-                if *piece_type != piece::NONE {
-                    self.create_piece(square, *color, *piece_type);
-
-                }
-                x -= 1;
-            }
-        }
-    }
-
-    /// Returns the FEN string of the current position
-    pub fn to_fen(&self) -> String {
-        let mut fen_string = String::new();
-
-        for y in (0..8).rev() {
-            let mut empty_squares = 0;
-
-            for x in (0..8).rev() {
-                let square = x + y * 8;
-                let (color, piece_type) = self.get_piece_on_square(square);
-
-                if piece_type == piece::NONE {
-                    empty_squares += 1;
-                } else {
-                    if empty_squares > 0 {
-                        fen_string.push_str(&empty_squares.to_string());
-                        empty_squares = 0;
-                    }
-
-                    fen_string.push(board_representation::piece_to_fen_sym(color, piece_type));
-                }
-            }
-
-            if empty_squares > 0 {
-                fen_string.push_str(&empty_squares.to_string());
-            }
-
-            if y > 0 {
-                fen_string.push('/');
-            }
-        }
-
-        fen_string.push(' ');
-
-        fen_string.push(if self.is_white_to_move() {'w'} else {'b'});
-        fen_string.push(' ');
-
-        let mut castling_string = String::new();
-        if castling::can_king_side(self.castling_states[WHITE]) {
-            castling_string.push('K');
-        }
-        if castling::can_queen_side(self.castling_states[WHITE]) {
-            castling_string.push('Q');
-        }
-        if castling::can_king_side(self.castling_states[BLACK]) {
-            castling_string.push('k');
-        }
-        if castling::can_queen_side(self.castling_states[BLACK]) {
-            castling_string.push('q');
-        }
-        if castling_string.is_empty() {
-            castling_string.push('-');
-        }
-        fen_string.push_str(&castling_string);
-
-        fen_string.push(' ');
-
-        if self.is_en_passant_possible() {
-            fen_string.push_str(
-                &board_representation::get_square_name(
-                    self.en_passant_capture_square()
-                )
-            );
-        } else {
-            fen_string.push('-');
-        }
-
-        // Add halfmove clock (50-move rule counter)
-        fen_string.push(' ');
-        fen_string.push_str(&self.halfmoves_50_rule_counter.to_string());
-
-        // Add fullmove number
-        fen_string.push(' ');
-        fen_string.push_str(&self.move_counter.to_string());
-
-        fen_string
     }
 
     pub fn get_current_color(&self) -> usize {
@@ -610,5 +444,32 @@ impl Board {
     /// Returns the Zobrist hash of the current position
     pub fn get_zobrist_hash(&self) -> u64 {
         self.zobrist_hash
+    }
+}
+
+#[cfg(feature = "__internal_api")]
+impl Board {
+    pub fn create_piece_public(&mut self, square: usize, color: usize, piece_type: usize) {
+        self.create_piece(square, color, piece_type);
+    }
+
+    pub fn rule50_count_mut(&mut self) -> &mut u8 {
+        &mut self.halfmoves_50_rule_counter
+    }
+
+    pub fn get_move_counter_mut(&mut self) -> &mut u16 {
+        &mut self.move_counter
+    }
+
+    pub fn update_en_passant_state_public(&mut self, possible: bool, pawn_square: usize, capture_square: usize) {
+        self.update_en_passant_state(possible, pawn_square, capture_square);
+    }
+
+    pub fn get_zobrist_hash_mut(&mut self) -> &mut u64 {
+        &mut self.zobrist_hash
+    }
+
+    pub fn get_position_history_mut(&mut self) -> &mut FxHashMap<u64, u8> {
+        &mut self.position_history
     }
 }

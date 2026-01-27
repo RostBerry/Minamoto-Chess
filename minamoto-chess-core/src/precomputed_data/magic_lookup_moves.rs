@@ -1,6 +1,6 @@
 use std::mem::MaybeUninit;
 
-use super::{magic_bitboard_data, square_magic::SquareMagic};
+use super::{magic_bitboards, square_magic::SquareMagic};
 
 pub struct MagicLookupMoves {
     relevant_occupancy: u64,
@@ -52,7 +52,7 @@ impl MagicLookupMoves {
         let square_magic = self.get_square_magic();
 
         let blocker_pattern = blockers & relevant_occupancy;
-        let lookup_index = magic_bitboard_data::generate_lookup_table_index(
+        let lookup_index = magic_bitboards::generate_lookup_table_index(
             square_magic.get_magic(), 
             square_magic.get_shift(), 
             blocker_pattern, 

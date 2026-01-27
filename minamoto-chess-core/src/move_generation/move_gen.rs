@@ -47,14 +47,6 @@ fn add_move(moves: &mut Vec<Move>, move_: Move) {
     moves.push(move_);
 }
 
-pub fn print(moves: &[Move]) {
-    println!("All moves({}):", moves.len());
-    for mov in moves {
-        print!("{} ", mov);
-    }
-    println!();
-}
-
 fn add_promotion_moves(
     moves: &mut Vec<Move>,
     start_square: usize, 
@@ -81,6 +73,7 @@ fn add_promotion_moves(
         )
     );
 
+    #[cfg(feature = "all_promotions")]
     add_move(
         moves,
         Move::new(
@@ -91,6 +84,7 @@ fn add_promotion_moves(
         )
     );
 
+    #[cfg(feature = "all_promotions")]
     add_move(
         moves,
         Move::new(

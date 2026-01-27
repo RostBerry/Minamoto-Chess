@@ -1,4 +1,4 @@
-use crate::r#move::UciMove;
+use crate::uci_move::UciMove;
 
 /// Represents a move and the number of its children nodes
 pub struct PerftNode {

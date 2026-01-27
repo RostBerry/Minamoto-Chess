@@ -1,13 +1,11 @@
-pub mod magic_bitboard_data;
+pub mod magic_bitboards;
 pub mod bitboard_data_gen;
 pub mod square_data;
 pub mod magic_score;
 mod bitboard_data;
 pub mod magic_lookup_table;
 pub mod square_magic;
-pub mod magic_bitboard_gen;
 pub mod magic_lookup_moves;
-pub mod magic_loader;
 
 use once_cell::sync::Lazy;
 

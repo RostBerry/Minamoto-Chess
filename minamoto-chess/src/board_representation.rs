@@ -1,6 +1,6 @@
+use minamoto_chess_core::{bitboards, board::Board, piece};
 /* Contains all values either constant or calculated on init, which are used only for better expierence 
 on the user side like more human representation of the squares (using *e1* instead of *3*) etc. */
-use crate::{bitboards, board::Board, piece};
 use phf::phf_map;
 
 // Decorative strings

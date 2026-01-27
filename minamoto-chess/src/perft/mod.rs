@@ -1,26 +1,52 @@
 use std::time::Instant;
 
-use crate::{board::Board, config, r#move::Move, move_generation::{attack_calculator::AttackCalculator, move_gen}};
+use minamoto_chess_core::{board::Board, r#move::Move, move_generation::{attack_calculator::AttackCalculator, move_gen}};
+
+use crate::{perft::{perft_node::PerftNode, perft_result::PerftResult}, uci_move::UciMove};
 
 pub mod perft_node;
+pub mod perft_result;
 
-pub fn run_perft(depth: u8, board: &mut Board) -> u64 {
+pub fn run_perft(depth: u8, board: &mut Board) -> PerftResult {
     let start = Instant::now();
+
+    let mut main_nodes: Vec<PerftNode> = Vec::with_capacity(move_gen::MAX_MOVES_PER_POS);
 
     
     let mut move_buffer: Vec<Vec<Move>> = (0..depth)
         .map(|_| Vec::with_capacity(move_gen::MAX_MOVES_PER_POS))
         .collect();
 
-    let result = count_nodes(depth, board, &mut move_buffer);
-    let duration = start.elapsed();
-
-    if config::DO_TERMINAL_OUTPUT {
-        println!("Perft result: {}", result);
-        println!("Time taken: {:?}", duration);
+    let (root_moves, remaining_buffer) = move_buffer.split_at_mut(1);
+    let root_moves = unsafe { root_moves.get_unchecked_mut(0) };
+    root_moves.clear();
+    
+    let attack_calc = AttackCalculator::new(board);
+    move_gen::generate_moves(root_moves, board, &attack_calc);
+    
+    let mut total_nodes = 0u64;
+    
+    for mov in root_moves.drain(..) {
+        let move_record = board.make_move(mov);
+        let nodes = if depth == 1 {
+            1
+        } else {
+            count_nodes(depth - 1, board, remaining_buffer)
+        };
+        board.undo_move(move_record);
+        
+        let uci_move = UciMove::from_move(mov);
+        main_nodes.push(PerftNode::new(uci_move, nodes as usize));
+        total_nodes += nodes;
     }
     
-    result
+    let duration = start.elapsed();
+    
+    PerftResult {
+        total_nodes: total_nodes as usize,
+        nodes_by_move: main_nodes,
+        duration: duration,
+    }
 }
 
 fn count_nodes(depth: u8, board: &mut Board, move_buffer: &mut [Vec<Move>]) -> u64 {
@@ -36,17 +62,12 @@ fn count_nodes(depth: u8, board: &mut Board, move_buffer: &mut [Vec<Move>]) -> u
         return current_moves.len() as u64;
     }
 
-    let do_output = depth == config::PERFT_DEPTH && config::DO_TERMINAL_OUTPUT;
-
     if depth == 2 {
         let mut nodes = 0;
         let (child_moves, _) = remaining_buffer.split_at_mut(1);
         let mut child_moves = unsafe { child_moves.get_unchecked_mut(0) };
 
         for mov in current_moves.drain(..) {
-            if do_output {
-                print!("{}: ", mov);
-            }
             let move_record = board.make_move(mov);
             child_moves.clear();
             let attack_calc = AttackCalculator::new(board);
@@ -54,10 +75,6 @@ fn count_nodes(depth: u8, board: &mut Board, move_buffer: &mut [Vec<Move>]) -> u
             board.undo_move(move_record);
             let child_nodes = child_moves.len() as u64;
             nodes += child_nodes;
-
-            if do_output {
-                println!("{}", child_nodes);
-            }
         }
         return nodes;
     }
@@ -65,17 +82,10 @@ fn count_nodes(depth: u8, board: &mut Board, move_buffer: &mut [Vec<Move>]) -> u
     let mut nodes = 0;
 
     for mov in current_moves.drain(..) {
-        if do_output {
-            print!("{}: ", mov);
-        }
         let move_record = board.make_move(mov);
         let child_nodes = count_nodes(depth - 1, board, remaining_buffer);
         board.undo_move(move_record);
         nodes += child_nodes;
-
-        if do_output {
-            println!("{}", child_nodes);
-        }
     }
 
     nodes

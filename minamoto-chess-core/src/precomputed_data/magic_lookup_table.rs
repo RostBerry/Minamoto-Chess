@@ -1,6 +1,6 @@
 use std::mem::MaybeUninit;
 
-use super::{magic_bitboard_data, magic_lookup_moves::MagicLookupMoves, square_magic::SquareMagic};
+use super::{magic_bitboards, magic_lookup_moves::MagicLookupMoves, square_magic::SquareMagic};
 
 pub struct MagicLookupTable {
     pseudo_legal_moves: [MagicLookupMoves; 64]
@@ -27,7 +27,7 @@ impl MagicLookupTable {
                 let pseudo_legal_move_pattern = super::BITBOARD_DATA
                     .get_pseudo_legal_moves(square, slider_index)[pattern_index];
 
-                let lookup_index = magic_bitboard_data::generate_lookup_table_index(magic.get_magic(), 
+                let lookup_index = magic_bitboards::generate_lookup_table_index(magic.get_magic(), 
                     magic.get_shift(), 
                     pattern, 
                     super::BITBOARD_DATA.get_relevant_occupancy(square, slider_index),

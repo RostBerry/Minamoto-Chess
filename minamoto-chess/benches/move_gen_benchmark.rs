@@ -1,13 +1,14 @@
 use std::time::Duration;
+use minamoto_chess::{config, fen_api::FenApi};
 
-use minamoto_chess::{config, board::Board, move_generation::{attack_calculator::AttackCalculator, move_gen}};
+use minamoto_chess_core::{board::Board, move_generation::{attack_calculator::AttackCalculator, move_gen}};
 use criterion::{criterion_group, criterion_main, Criterion, BenchmarkId};
 
 fn benchmark_comparison(c: &mut Criterion) {
     let mut group = c.benchmark_group("minamoto_move_generation");
     
     // Shared resources
-    let mut board = Board::from_fen(config::CHESS_BENCHMARK_FEN);
+    let mut board = Board::from_fen(config::BENCHMARK_FEN);
     let mut legal_moves = Vec::with_capacity(218);
 
     group.bench_function(BenchmarkId::new("legal_movegen_benchmark", ""), |b| {
