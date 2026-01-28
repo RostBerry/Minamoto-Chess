@@ -1,20 +1,20 @@
-use crate::uci_move::UciMove;
+use minamoto_chess_core::r#move::Move;
 
 /// Represents a move and the number of its children nodes
 pub struct PerftNode {
-    mov: UciMove,
+    mov: Move,
     nodes: usize,
 }
 
 impl PerftNode {
-    pub fn new(mov: UciMove, nodes: usize) -> PerftNode {
+    pub fn new(mov: Move, nodes: usize) -> PerftNode {
         PerftNode {
             mov,
             nodes,
         }
     }
 
-    pub fn get_move(&self) -> &UciMove {
+    pub fn get_move(&self) -> &Move {
         &self.mov
     }
 

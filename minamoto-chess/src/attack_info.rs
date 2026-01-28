@@ -1,5 +1,6 @@
 use minamoto_chess_core::move_generation::attack_calculator::AttackCalculator;
 use serde::{Deserialize, Serialize};
+use tsify::Tsify;
 
 fn attacked_squares_bb_to_vec(attacked_squares_bb: u64) -> Vec<usize> {
     let mut squares = Vec::new();
@@ -11,7 +12,8 @@ fn attacked_squares_bb_to_vec(attacked_squares_bb: u64) -> Vec<usize> {
     squares
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Tsify, Serialize, Deserialize)]
+#[tsify(into_wasm_abi)]
 pub struct AttackInfo {
     attacked_squares: Vec<usize>,
 }

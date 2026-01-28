@@ -2,7 +2,7 @@ use std::time::Instant;
 
 use minamoto_chess_core::{board::Board, r#move::Move, move_generation::{attack_calculator::AttackCalculator, move_gen}};
 
-use crate::{perft::{perft_node::PerftNode, perft_result::PerftResult}, uci_move::UciMove};
+use crate::{perft::{perft_node::PerftNode, perft_result::PerftResult}};
 
 pub mod perft_node;
 pub mod perft_result;
@@ -34,9 +34,8 @@ pub fn run_perft(depth: u8, board: &mut Board) -> PerftResult {
             count_nodes(depth - 1, board, remaining_buffer)
         };
         board.undo_move(move_record);
-        
-        let uci_move = UciMove::from_move(mov);
-        main_nodes.push(PerftNode::new(uci_move, nodes as usize));
+
+        main_nodes.push(PerftNode::new(mov, nodes as usize));
         total_nodes += nodes;
     }
     

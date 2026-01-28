@@ -38,7 +38,7 @@ impl FenApi for Board {
         // Set en passant state if available
         if fen_data.len() > 3 && fen_data[3] != "-" {
             let square = board_representation::get_square_from_name(fen_data[3]);
-            let pawn_offset = if board.get_current_color() == WHITE { 8 } else { -8i32 };
+            let pawn_offset = if board.get_current_color() == WHITE { -8i32 } else { 8 };
             let capture_square = square;
             let pawn_square = (square as i32 + pawn_offset) as usize;
             board.update_en_passant_state_public(true, pawn_square, capture_square);

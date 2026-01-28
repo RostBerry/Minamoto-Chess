@@ -1,16 +1,20 @@
 use minamoto_chess_core::{board::Board, r#move::Move, move_generation::attack_calculator::AttackCalculator, piece};
 use serde::{Deserialize, Serialize};
+use tsify::Tsify;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Tsify, Serialize, Deserialize, Debug)]
+#[tsify(into_wasm_abi)]
 pub enum GameMode {
     PvP,
     PvB,
     BvB
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Tsify, Serialize, Deserialize, Debug)]
+#[tsify(into_wasm_abi)]
 pub enum GameState {
-    InProgress,
+    WhiteToMove,
+    BlackToMove,
     WhiteWon,
     BlackWon,
     Draw
@@ -42,6 +46,10 @@ impl GameState {
             return GameState::Draw;
         }
 
-        GameState::InProgress
+        if board.get_current_color() == piece::WHITE {
+            GameState::WhiteToMove
+        } else {
+            GameState::BlackToMove
+        }
     }
 }

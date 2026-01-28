@@ -1,6 +1,6 @@
-use minamoto_chess_core::{bitboards, board::{self, Board}, r#move::{Move}, piece};
+use minamoto_chess_core::{bitboards, board::{self, Board}, r#move::{Move, MoveType}, piece};
 
-use crate::{board_representation::{get_square_name, piece_to_fen_sym}, move_type_wrapper::MoveType, uci_move::UciMove};
+use crate::{board_representation::{get_square_name, piece_to_fen_sym}, uci_move::{PromotionType, UciMove}};
 
 pub fn print(moves: &[Move]) {
     println!("All moves({}):", moves.len());
@@ -35,14 +35,22 @@ impl MoveExtensions for Move {
         let target_square = mov.target_square;
         let target_square_bb = bitboards::get_bit_from_square(target_square);
         let (color, piece_type) = board.get_piece_on_square(start_square);
-        let is_capture = target_square_bb & board.get_all_occupied_squares() != 0;
         let mut capture_square = target_square;
 
-        if is_capture && board.is_en_passant_possible() && target_square_bb == bitboards::get_bit_from_square(board.en_passant_capture_square()) {
+        if piece_type == piece::PAWN && board.is_en_passant_possible() && target_square_bb == bitboards::get_bit_from_square(board.en_passant_capture_square()) {
             capture_square = board.en_passant_pawn_square();
         }
 
-        let mut move_type = MoveType::from(mov.move_type);
+        let mut move_type = MoveType::Regular;
+
+        if let Some(promotion_type) = mov.promotion {
+            move_type = match promotion_type {
+                PromotionType::Queen => MoveType::PromotionQueen,
+                PromotionType::Knight => MoveType::PromotionKnight,
+                PromotionType::Rook => MoveType::PromotionRook,
+                PromotionType::Bishop => MoveType::PromotionBishop,
+            };
+        }
 
         if piece_type == piece::KING && start_square == board::get_king_start_square(color) {
             if target_square == board::get_king_side_square(color) {
