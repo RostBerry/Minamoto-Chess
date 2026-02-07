@@ -47,7 +47,7 @@ fn get_pawn_start_rank(color: usize) -> u64 {
 }
 
 fn add_move(moves: &mut Vec<Move>, move_: Move) {
-    debug_assert!(moves.len() < MAX_MOVES_PER_POS, "Moves vector is full");
+    debug_assert!(moves.len() < moves.capacity(), "Moves vector is full");
     moves.push(move_);
 }
 
@@ -557,7 +557,7 @@ fn generate_queens(moves: &mut Vec<Move>, board: &Board, current_color: usize, a
     }
 }
 
-pub fn filter_loud_moves(legal_moves: &mut Vec<Move>, filtered_moves: &mut Vec<Move>, attack_calc: &AttackCalculator, board: &Board) {
+pub fn filter_loud_moves(legal_moves: &[Move], filtered_moves: &mut Vec<Move>, attack_calc: &AttackCalculator, board: &Board) {
     let move_count = legal_moves.len();
     for i in 0..move_count {
         let mov = unsafe {
