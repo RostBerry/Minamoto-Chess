@@ -6,7 +6,7 @@ use tsify::Tsify;
 
 use crate::{board_representation::{get_piece_from_fen, get_square_from_name, get_square_name, piece_to_fen_sym}};
 
-#[derive(Tsify, Serialize, Deserialize)]
+#[derive(Tsify, Serialize, Deserialize, PartialEq)]
 #[tsify(into_wasm_abi)]
 pub enum PromotionType {
     Queen,

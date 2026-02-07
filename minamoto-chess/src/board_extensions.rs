@@ -4,6 +4,7 @@ use crate::board_representation;
 
 pub trait BoardExtensions {
     fn load_position(&mut self, position: &str);
+    fn count_material(&self) -> i8;
 }
 
 impl BoardExtensions for Board {
@@ -33,5 +34,44 @@ impl BoardExtensions for Board {
                 x -= 1;
             }
         }
+    }
+
+    /// Returns positive if white has more material, negative if black has more, 0 if equal.
+    /// 
+    /// Uses standard piece values: Pawn=1, Knight=3, Bishop=3, Rook=5, Queen=9
+    /// King is not counted.
+    #[inline]
+    fn count_material(&self) -> i8 {
+        const PAWN_VALUE: i8 = 1;
+        const KNIGHT_VALUE: i8 = 3;
+        const BISHOP_VALUE: i8 = 3;
+        const ROOK_VALUE: i8 = 5;
+        const QUEEN_VALUE: i8 = 9;
+
+        let w_pawns   = self.get_piece_bitboard(piece::WHITE, piece::PAWN).count_ones() as i8;
+        let w_knights = self.get_piece_bitboard(piece::WHITE, piece::KNIGHT).count_ones() as i8;
+        let w_bishops = self.get_piece_bitboard(piece::WHITE, piece::BISHOP).count_ones() as i8;
+        let w_rooks   = self.get_piece_bitboard(piece::WHITE, piece::ROOK).count_ones() as i8;
+        let w_queens  = self.get_piece_bitboard(piece::WHITE, piece::QUEEN).count_ones() as i8;
+
+        let b_pawns   = self.get_piece_bitboard(piece::BLACK, piece::PAWN).count_ones() as i8;
+        let b_knights = self.get_piece_bitboard(piece::BLACK, piece::KNIGHT).count_ones() as i8;
+        let b_bishops = self.get_piece_bitboard(piece::BLACK, piece::BISHOP).count_ones() as i8;
+        let b_rooks   = self.get_piece_bitboard(piece::BLACK, piece::ROOK).count_ones() as i8;
+        let b_queens  = self.get_piece_bitboard(piece::BLACK, piece::QUEEN).count_ones() as i8;
+
+        let white_material = w_pawns * PAWN_VALUE
+                           + w_knights * KNIGHT_VALUE
+                           + w_bishops * BISHOP_VALUE
+                           + w_rooks * ROOK_VALUE
+                           + w_queens * QUEEN_VALUE;
+
+        let black_material = b_pawns * PAWN_VALUE
+                           + b_knights * KNIGHT_VALUE
+                           + b_bishops * BISHOP_VALUE
+                           + b_rooks * ROOK_VALUE
+                           + b_queens * QUEEN_VALUE;
+
+        white_material - black_material
     }
 }

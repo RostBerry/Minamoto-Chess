@@ -414,6 +414,7 @@ impl Board {
     }
     
     /// Checks if the current position has occurred three or more times
+    #[inline]
     pub fn is_draw_by_repetition(&self) -> bool {
         if let Some(count) = self.position_history.get(&self.zobrist_hash) {
             *count >= 3
@@ -422,10 +423,12 @@ impl Board {
         }
     }
 
+    #[inline]
     pub fn is_draw_by_50_moves_rule(&self) -> bool {
         self.halfmoves_50_rule_counter >= 50
     }
 
+    #[inline]
     pub fn is_draw_by_material(&self) -> bool {
         !(self.enough_material(WHITE) || self.enough_material(BLACK))
     }
@@ -442,6 +445,7 @@ impl Board {
     }
     
     /// Returns the Zobrist hash of the current position
+    #[inline]
     pub fn get_zobrist_hash(&self) -> u64 {
         self.zobrist_hash
     }

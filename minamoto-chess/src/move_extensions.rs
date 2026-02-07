@@ -68,7 +68,7 @@ impl MoveExtensions for Move {
             start_square,
             target_square,
             capture_square,
-            move_type: move_type.into()
+            move_type
         }
     }
 }

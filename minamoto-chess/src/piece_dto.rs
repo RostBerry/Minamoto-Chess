@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use tsify::Tsify;
 
-#[derive(Tsify, Serialize, Deserialize, Debug)]
+#[derive(Tsify, Serialize, Deserialize, Debug, Clone)]
 #[tsify(into_wasm_abi, from_wasm_abi)]
 pub enum PieceType {
     King,
@@ -26,7 +26,7 @@ impl PieceType {
     }
 }
 
-#[derive(Tsify, Serialize, Deserialize, Debug)]
+#[derive(Tsify, Serialize, Deserialize, Debug, Clone)]
 #[tsify(into_wasm_abi, from_wasm_abi)]
 pub enum PieceColor {
     White,
@@ -43,7 +43,7 @@ impl PieceColor {
     }
 }
 
-#[derive(Tsify, Serialize, Deserialize, Debug)]
+#[derive(Tsify, Serialize, Deserialize, Debug, Clone)]
 #[tsify(into_wasm_abi, from_wasm_abi)]
 pub struct Piece {
     pub piece_type: PieceType,

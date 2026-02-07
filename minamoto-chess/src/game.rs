@@ -1,4 +1,4 @@
-use minamoto_chess_core::{board::Board, r#move::Move, move_generation::attack_calculator::AttackCalculator, piece};
+use minamoto_chess_core::{board::Board, move_generation::attack_calculator::AttackCalculator, piece};
 use serde::{Deserialize, Serialize};
 use tsify::Tsify;
 
@@ -21,7 +21,11 @@ pub enum GameState {
 }
 
 impl GameState {
-    pub fn from_current_state(board: &Board, legal_moves: &[Move], attack_calc: &AttackCalculator) -> GameState {
+    pub fn from_current_state<T>(
+        board: &Board, 
+        legal_moves: &[T], 
+        attack_calc: &AttackCalculator
+    ) -> GameState {
         if legal_moves.is_empty() {
             if attack_calc.in_check() {
                 match board.get_current_color() {
